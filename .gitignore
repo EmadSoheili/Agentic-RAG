@@ -163,3 +163,7 @@ cython_debug/
 langchain-docs/
 .DS_Store
 .chroma_db/.venv
+
+# Vector database and local storage
+.chroma/
+*.sqlite3

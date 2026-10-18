@@ -21,6 +21,8 @@ dependencies = [
     "langgraph>=1.2.15",
     "pytest>=9.1.1",
     "python-dotenv>=1.2.4",
+    "tiktoken>=0.14.0",
+    "unstructured>=0.27.28",
 ]
 
 [project.scripts]
