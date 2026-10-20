@@ -1,3 +1,9 @@
+# Here we create the Generate node in our graph.
+# This node will take the current state of the graph, which includes the question and the retrieved documents.
+# Then use the generate chain to generate an answer to the question based on the retrieved documents.
+# Them write the generated answer, the question, and the documents to the state.
+
+
 from typing import Any, Dict
 from graph.chains.generation import generation_chain
 from graph.state import GraphState

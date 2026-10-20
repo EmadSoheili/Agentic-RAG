@@ -8,5 +8,6 @@
   "python.testing.pytestEnabled": true,
   "terminal.integrated.env.osx": {
     "PYTHONPATH": "${workspaceFolder}"
-  }
+  },
+  "PYTHONWARNINGS": "ignore"
 }
