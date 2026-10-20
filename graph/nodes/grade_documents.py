@@ -21,4 +21,27 @@ def grade_documents(state: GraphState) -> Dict[str, Any]:
         state (dict): Filtered out irrelevant documents and updated web_search state
     """
 
+    print("---CHECK DOCUMENT RELEVANCE TO QUESTION---")
+    question = state["question"]
+    documents = state["documents"]
 
+    # When we found a relevant document, we will append it to the filtered_docs list.
+    filtered_docs = []
+
+    # Initialize the web_search flag to False.
+    web_search = False
+
+    for d in documents:
+        # Use the retrieval grader to get a binary score for the relevance of the documents.
+        score = retrieval_grader.invoke({"document": d.page_content, "question": question})
+
+        grade = score.binary_score          # Get the binary score we defined in the GradeDocuments
+
+        if grade.lower() == "yes":          # Check the lower case of binary score
+            print("---GRADE: DOCUMENT IS RELEVANT---")
+        else:
+            print("---GRADE: DOCUMENT IS NOT RELEVANT---")
+            web_search = True
+            continue            # in this case we won't add the document to the filtered_docs list.
+
+    return {"documents": filtered_docs, "question": question, "web_search": web_search}

@@ -31,6 +31,13 @@ text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(chunk_size=
 doc_splits = text_splitter.split_documents(docs_list)
 
 
+# Clean heavy and base64 metadata fields produced by UnstructuredLoader
+for doc in doc_splits:
+    doc.metadata.pop("orig_elements", None)
+    doc.metadata.pop("emphasized_text_contents", None)
+    doc.metadata.pop("link_texts", None)
+
+
 # Create a vector store from the document chunks using Google Gemini embeddings and Chroma as the vector store
 # It is commented out to avoid re-ingesting the data every time the script is run. 
 # Uncomment it if you want to ingest the data again.
