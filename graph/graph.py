@@ -12,6 +12,7 @@ from graph.nodes import retrieve, grade_documents, generate, web_search         
 from graph.state import GraphState           # To define the state of the graph.
 from graph.chains.answer_grader import answer_grader            # To use the answer grader chain to grade the documents.
 from graph.chains.hallucination_grader import hallucinatin_grader            # To use the hallucination grader chain to grade the documents.
+from graph.chains.router import question_router, RouteQuery           # To use the router chain to route the question to the appropriate node.
 
 
 # Define the function that will decide whether to generate an answer or search the web based on the graded documents.
@@ -27,7 +28,7 @@ def decide_to_generate(state):
         return GENERATE
 
 
-#
+# Define the function that will grade the generation for hallucination and whether it answers the question.
 def grade_generation_grounded_in_documents_and_question(state: GraphState) -> str:
     print("---CHECK HALLUCINATION---")
 
@@ -59,6 +60,22 @@ def grade_generation_grounded_in_documents_and_question(state: GraphState) -> st
         return "not supported"
 
 
+#
+def route_question(state: GraphState) -> str:
+    print("---ROUTE QUESTION---")
+    
+    question = state["question"]
+    source: RouteQuery = question_router.invoke({"question": question})           # Invoke the router chain to route the question to the appropriate node.
+        # The result will have either 'vectorstore' or 'web_search' under datasource as we defined the structure in the RouteQuery class.
+
+    if source.datasource == "web_search":
+        print("---ROUTE QUESTION TO WEB SEARCH---")
+        return WEB_SEARCH
+    else:
+        print("---ROUTE QUESTION TO VECTORESTORE---")
+        return RETRIEVE
+
+
 # Create a state graph that will define the flow of our application.
 workflow = StateGraph(GraphState)
 
@@ -67,7 +84,14 @@ workflow.add_node(RETRIEVE, retrieve)           # Add the retrieve node to the g
 workflow.add_node(GRADE_DOCUMENTS, grade_documents)           # Add the grade_documents node to the graph.
 workflow.add_node(GENERATE, generate)           # Add the generate node to the graph.
 workflow.add_node(WEB_SEARCH, web_search)           # Add the web_search node to the graph.
-workflow.set_entry_point(RETRIEVE)           # Set the entry point of the graph to the retrieve node.
+
+workflow.set_conditional_entry_point(
+    route_question,           # The function that will decide which node to enter first based on the question.
+    {
+        WEB_SEARCH: WEB_SEARCH,           # If the question is routed to web search, enter the web_search node.
+        RETRIEVE: RETRIEVE,           # If the question is routed to vectorstore
+    }
+)
 
 
 # Create edges

@@ -1,4 +1,4 @@
-# 
+# Here we create a chain that will check if the answer is addressing the question or not.
 
 
 from langchain_core.prompts import ChatPromptTemplate           # To create a prompt template for the LLM.

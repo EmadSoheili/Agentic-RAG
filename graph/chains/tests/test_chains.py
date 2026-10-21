@@ -5,6 +5,7 @@ from graph.chains.retrieval_grader import GradeDocuments, retrieval_grader
 from ingestion import retriever
 from graph.chains.generation import generation_chain
 from graph.chains.hallucination_grader import hallucinatin_grader, GradeHallucinations
+from graph.chains.router import question_router, RouteQuery
 
 
 
@@ -92,3 +93,27 @@ def test_hallucination_grader_answer_no() -> None:
     )
 
     assert not res.binary_score
+
+
+
+# --------------------------------------------------------------------------------------------------
+# 6th Test Case: Test the router chain for getting vectorestore as the routing option.
+# --------------------------------------------------------------------------------------------------
+def test_router_to_vectorestore() -> None:
+    question = "agent memory"
+    
+    res: RouteQuery = question_router.invoke({"question": question})           # Invoke the router chain
+
+    assert res.datasource == "vectorestore"           # Assert that the router routes to vectorestore
+
+
+
+# --------------------------------------------------------------------------------------------------
+# 7th Test Case: Test the router chain for getting web_search as the routing option.
+# --------------------------------------------------------------------------------------------------
+def test_router_to_web_search() -> None:
+    question = "How to make a pizza?"
+    
+    res: RouteQuery = question_router.invoke({"question": question})           # Invoke the router chain
+
+    assert res.datasource == "web_search"           # Assert that the router routes to web_search

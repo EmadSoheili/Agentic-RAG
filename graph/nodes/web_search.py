@@ -19,7 +19,7 @@ web_search_tool = TavilySearch(max_results=3)           # Create an instance of 
 def web_search(state: GraphState) -> Dict[str, Any]:
     print("---WEB SEARCH---")
     question = state["question"]           # Get the question from the current state of the graph.
-    documents = state["documents"]           # Get the documents from the current state of the graph.
+    documents = state["documents"] if "documents" in state else None           # Get the documents from the current state of the graph.
         # Since we are getting the document after checking for relevance, so we should only get relevant documents here.
 
     tavily_results = web_search_tool.invoke({"query": question})["results"]       # Use Tavily to search the web for our question.
@@ -33,6 +33,8 @@ def web_search(state: GraphState) -> Dict[str, Any]:
 
     if documents is not None:
         documents.append(web_results)           # Append the web search results to the existing documents.
+    else:
+        documents = [web_results]           # If there were no existing documents, create a new list with the web search results.
 
     return {"documents": documents, "question": question}           # Update the state with the new documents and the question.
 
