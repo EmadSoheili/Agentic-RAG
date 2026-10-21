@@ -4,6 +4,7 @@ load_dotenv()  # Load environment variables from .env file
 from graph.chains.retrieval_grader import GradeDocuments, retrieval_grader
 from ingestion import retriever
 from graph.chains.generation import generation_chain
+from graph.chains.hallucination_grader import hallucinatin_grader, GradeHallucinations
 
 
 
@@ -55,3 +56,39 @@ def test_generation_chain() -> None:
     
     assert isinstance(generation, str) and len(generation.strip()) > 0          # Assert that the generation is a non-empty string
         # For seeing the result, you can check LangSmith tracing.
+
+
+
+# --------------------------------------------------------------------------------------------------
+# 4th Test Case: Test hallucination grader with a relevant question (non-hallucinated answer)
+# --------------------------------------------------------------------------------------------------
+def test_hallucination_grader_answer_yes() -> None:
+    question = "agent memory"
+    docs = retriever.invoke(question)            # Retrieve documents using the retriever
+    
+    generation = generation_chain.invoke({"context": docs, "question": question})           # Invoke the generation chain
+
+    res: GradeHallucinations = hallucinatin_grader.invoke(
+        {"documents": docs, "generation": generation}
+    )
+
+    assert res.binary_score
+
+
+
+# --------------------------------------------------------------------------------------------------
+# 5th Test Case: Test hallucination grader with a irrelevant generated answer (hallucinated answer)
+# --------------------------------------------------------------------------------------------------
+def test_hallucination_grader_answer_no() -> None:
+    question = "agent memory"
+    docs = retriever.invoke(question)            # Retrieve documents using the retriever
+    
+    generation = generation_chain.invoke({"context": docs, "question": question})           # Invoke the generation chain
+
+    res: GradeHallucinations = hallucinatin_grader.invoke(
+        {"documents": docs,
+         "generation": "In order to make pizza we need to first start with the dough."
+        }
+    )
+
+    assert not res.binary_score

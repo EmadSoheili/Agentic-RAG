@@ -1,3 +1,7 @@
+# This is the main entry point for the application. 
+# It initializes the environment, imports the graph application, and invokes it with a sample question.
+
+
 from dotenv import load_dotenv
 load_dotenv()  # Load environment variables from .env file
 
