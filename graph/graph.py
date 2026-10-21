@@ -110,7 +110,6 @@ workflow.add_conditional_edges(
 )
 
 workflow.add_edge(WEB_SEARCH, GENERATE)           # Add an edge from the web_search node to the end of the graph.
-workflow.add_edge(GENERATE, END)           # Add an edge from the generate node to the end of the graph.
 
 
 # Compile and visualize the graph
